@@ -1,0 +1,16 @@
+.src-python {
+    background-color: #242728;
+    color: #f8fbfc;
+}
+
+#table-of-contents li {
+    display: inline;
+}
+
+#table-of-contents li:before {
+    content: "{";
+}
+
+#table-of-contents li:after {
+    content: "}";
+}
