@@ -9774,6 +9774,350 @@ L 14
 R 15
 U 10
 #+END_SRC
+* [[https://adventofcode.com/2022/day/10][Day 10]]
+** Code
+#+begin_src python :results output :var data=DAY10_DATA :exports both
+class Program:
+    def __init__(self, checks):
+        self.x = 1
+        self.current_cycle = 1
+        self.checks = checks
+        self.signal_strength = 0
+        self.image = ''
+        self.image_cycle = [40, 80, 120, 160, 200, 240]
+        self.image_cycle_current = 0
+
+    def cycle(self):
+        if self.current_cycle in self.checks:
+            self.signal_strength += self.current_cycle * self.x
+        if self.x <= self.current_cycle - self.image_cycle_current <= self.x + 2:
+            self.image += "#"
+        else:
+            self.image += '.'
+        if self.current_cycle in self.image_cycle:
+            self.image += '\n'
+            self.image_cycle_current = self.current_cycle
+        self.current_cycle += 1
+
+    def process_data(self):
+        for line in data.split('\n'):
+            cmd = line.split()
+            if len(cmd) == 1:  # noop
+                self.cycle()
+            else:
+                self.cycle()
+                self.cycle()
+                self.x += int(cmd[1])
+
+runner = Program([20, 60, 100, 140, 180, 220])
+runner.process_data()
+print(runner.signal_strength)
+print(runner.image)
+#+end_src
+
+#+RESULTS:
+: 14920
+: ###..#..#..##...##...##..###..#..#.####.
+: #..#.#..#.#..#.#..#.#..#.#..#.#..#....#.
+: ###..#..#.#....#..#.#....###..#..#...#..
+: #..#.#..#.#....####.#....#..#.#..#..#...
+: #..#.#..#.#..#.#..#.#..#.#..#.#..#.#....
+: ###...##...##..#..#..##..###...##..####.
+:
+
+** Data :noexport:
+#+NAME: DAY10_DATA_EXAMPLE
+#+HEADER: :noweb
+#+begin_src org :results value raw
+addx 15
+addx -11
+addx 6
+addx -3
+addx 5
+addx -1
+addx -8
+addx 13
+addx 4
+noop
+addx -1
+addx 5
+addx -1
+addx 5
+addx -1
+addx 5
+addx -1
+addx 5
+addx -1
+addx -35
+addx 1
+addx 24
+addx -19
+addx 1
+addx 16
+addx -11
+noop
+noop
+addx 21
+addx -15
+noop
+noop
+addx -3
+addx 9
+addx 1
+addx -3
+addx 8
+addx 1
+addx 5
+noop
+noop
+noop
+noop
+noop
+addx -36
+noop
+addx 1
+addx 7
+noop
+noop
+noop
+addx 2
+addx 6
+noop
+noop
+noop
+noop
+noop
+addx 1
+noop
+noop
+addx 7
+addx 1
+noop
+addx -13
+addx 13
+addx 7
+noop
+addx 1
+addx -33
+noop
+noop
+noop
+addx 2
+noop
+noop
+noop
+addx 8
+noop
+addx -1
+addx 2
+addx 1
+noop
+addx 17
+addx -9
+addx 1
+addx 1
+addx -3
+addx 11
+noop
+noop
+addx 1
+noop
+addx 1
+noop
+noop
+addx -13
+addx -19
+addx 1
+addx 3
+addx 26
+addx -30
+addx 12
+addx -1
+addx 3
+addx 1
+noop
+noop
+noop
+addx -9
+addx 18
+addx 1
+addx 2
+noop
+noop
+addx 9
+noop
+noop
+noop
+addx -1
+addx 2
+addx -37
+addx 1
+addx 3
+noop
+addx 15
+addx -21
+addx 22
+addx -6
+addx 1
+noop
+addx 2
+addx 1
+noop
+addx -10
+noop
+noop
+addx 20
+addx 1
+addx 2
+addx 2
+addx -6
+addx -11
+noop
+noop
+noop
+#+end_src
+#+NAME: DAY10_DATA
+#+HEADER: :noweb
+#+BEGIN_SRC org :results value raw
+noop
+noop
+addx 5
+addx 29
+addx -28
+addx 5
+addx -1
+noop
+noop
+addx 5
+addx 12
+addx -6
+noop
+addx 4
+addx -1
+addx 1
+addx 5
+addx -31
+addx 32
+addx 4
+addx 1
+noop
+addx -38
+addx 5
+addx 2
+addx 3
+addx -2
+addx 2
+noop
+addx 3
+addx 2
+addx 5
+addx 2
+addx 3
+noop
+addx 2
+addx 3
+noop
+addx 2
+addx -32
+addx 33
+addx -20
+addx 27
+addx -39
+addx 1
+noop
+addx 5
+addx 3
+noop
+addx 2
+addx 5
+noop
+noop
+addx -2
+addx 5
+addx 2
+addx -16
+addx 21
+addx -1
+addx 1
+noop
+addx 3
+addx 5
+addx -22
+addx 26
+addx -39
+noop
+addx 5
+addx -2
+addx 2
+addx 5
+addx 2
+addx 23
+noop
+addx -18
+addx 1
+noop
+noop
+addx 2
+noop
+noop
+addx 7
+addx 3
+noop
+addx 2
+addx -27
+addx 28
+addx 5
+addx -11
+addx -27
+noop
+noop
+addx 3
+addx 2
+addx 5
+addx 2
+addx 27
+addx -26
+addx 2
+addx 5
+addx 2
+addx 4
+addx -3
+addx 2
+addx 5
+addx 2
+addx 3
+addx -2
+addx 2
+noop
+addx -33
+noop
+noop
+noop
+noop
+addx 31
+addx -26
+addx 6
+noop
+noop
+addx -1
+noop
+addx 3
+addx 5
+addx 3
+noop
+addx -1
+addx 5
+addx 1
+addx -12
+addx 17
+addx -1
+addx 5
+noop
+noop
+addx 1
+noop
+noop
+#+END_SRC
 * Day N :noexport:
 ** Code
 #+begin_src python :results output :var data=DAYN_DATA :exports both
