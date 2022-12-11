@@ -10118,6 +10118,212 @@ addx 1
 noop
 noop
 #+END_SRC
+* [[https://adventofcode.com/2022/day/11][Day 11]]
+** Code
+#+begin_src python :results output :var data=DAY11_DATA :exports both
+import copy
+class Monkey:
+
+    def __init__(self):
+        self.items = []
+        self._if_true = None
+        self._if_false = None
+        self.inspected = 0
+
+    def inspect(self):
+        if len(self.items):
+            self.inspected += 1
+            item = self.items.pop(0)
+            item = self.operation(item)
+            return item
+        return None
+
+    def throw(self, item):
+        return self._if_true if self.test(item) else self._if_false
+
+class Game:
+
+    def __init__(self, relief):
+        self.monkeys = []
+        self.relief = relief
+        self.gcd = 1
+
+    def add_monkey(self, monkey):
+        monkey.relief = self.relief
+        self.monkeys.append(monkey)
+
+    def run(self, rounds):
+        for r in range(rounds):
+            for i, monkey in enumerate(self.monkeys):
+                 for _ in range(len(monkey.items)):
+                     item = monkey.inspect()
+                     if item is not None:
+                        if self.relief:
+                            item = item // 3
+                        else:
+                            item = item % self.gcd
+                        index = monkey.throw(item)
+                        self.monkeys[index].items.append(item)
+
+def create_game(relief):
+    game = Game(relief)
+    monkey = None
+    for line in iter(data.split('\n')):
+        if "Monkey" in line:
+            monkey = Monkey()
+        elif "Starting" in line:
+            _, items = line.split(':')
+            items = items.split(',')
+            monkey.items.extend([int(i) for i in items])
+        elif "Operation" in line:
+            _, equation = line.split('=')
+            def operation(e):
+                return lambda old: eval(f'{e}')
+            setattr(monkey, 'operation', operation(equation))
+        elif "Test:" in line:
+            equation = line.split()
+            def test(e):
+                return lambda v: v % int(e) == 0
+            setattr(monkey, 'test', test(equation[3]))
+            game.gcd *= int(equation[3])
+        elif "If true:" in line:
+            monkey._if_true = int(line.split()[-1])
+        elif "If false:" in line:
+            monkey._if_false = int(line.split()[-1])
+        elif "" == line:
+            game.add_monkey(monkey)
+    game.add_monkey(monkey)
+    return game
+
+def game_results(g):
+    inspected = []
+    for i, monkey in enumerate(g.monkeys):
+        print(f'Monkey {i} inspected items {monkey.inspected} times.')
+        inspected.append(monkey.inspected)
+    inspected.sort()
+    print(f'Part 1: {inspected[-1] * inspected[-2]}')
+
+game = create_game(True)
+game2 = create_game(False)
+game.run(20)
+game2.run(10000)
+game_results(game)
+game_results(game2)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Monkey 0 inspected items 217 times.
+Monkey 1 inspected items 112 times.
+Monkey 2 inspected items 37 times.
+Monkey 3 inspected items 232 times.
+Monkey 4 inspected items 236 times.
+Monkey 5 inspected items 205 times.
+Monkey 6 inspected items 41 times.
+Monkey 7 inspected items 225 times.
+Part 1: 54752
+Monkey 0 inspected items 60002 times.
+Monkey 1 inspected items 56692 times.
+Monkey 2 inspected items 63353 times.
+Monkey 3 inspected items 116668 times.
+Monkey 4 inspected items 60034 times.
+Monkey 5 inspected items 116628 times.
+Monkey 6 inspected items 60010 times.
+Monkey 7 inspected items 63343 times.
+Part 1: 13606755504
+#+end_example
+
+** Data :noexport:
+#+NAME: DAY11_DATA_EXAMPLE
+#+HEADER: :noweb
+#+begin_src org :results value raw
+Monkey 0:
+  Starting items: 79, 98
+  Operation: new = old * 19
+  Test: divisible by 23
+    If true: throw to monkey 2
+    If false: throw to monkey 3
+
+Monkey 1:
+  Starting items: 54, 65, 75, 74
+  Operation: new = old + 6
+  Test: divisible by 19
+    If true: throw to monkey 2
+    If false: throw to monkey 0
+
+Monkey 2:
+  Starting items: 79, 60, 97
+  Operation: new = old * old
+  Test: divisible by 13
+    If true: throw to monkey 1
+    If false: throw to monkey 3
+
+Monkey 3:
+  Starting items: 74
+  Operation: new = old + 3
+  Test: divisible by 17
+    If true: throw to monkey 0
+    If false: throw to monkey 1
+#+end_src
+#+NAME: DAY11_DATA
+#+HEADER: :noweb
+#+BEGIN_SRC org :results value raw
+Monkey 0:
+  Starting items: 85, 77, 77
+  Operation: new = old * 7
+  Test: divisible by 19
+    If true: throw to monkey 6
+    If false: throw to monkey 7
+
+Monkey 1:
+  Starting items: 80, 99
+  Operation: new = old * 11
+  Test: divisible by 3
+    If true: throw to monkey 3
+    If false: throw to monkey 5
+
+Monkey 2:
+  Starting items: 74, 60, 74, 63, 86, 92, 80
+  Operation: new = old + 8
+  Test: divisible by 13
+    If true: throw to monkey 0
+    If false: throw to monkey 6
+
+Monkey 3:
+  Starting items: 71, 58, 93, 65, 80, 68, 54, 71
+  Operation: new = old + 7
+  Test: divisible by 7
+    If true: throw to monkey 2
+    If false: throw to monkey 4
+
+Monkey 4:
+  Starting items: 97, 56, 79, 65, 58
+  Operation: new = old + 5
+  Test: divisible by 5
+    If true: throw to monkey 2
+    If false: throw to monkey 0
+
+Monkey 5:
+  Starting items: 77
+  Operation: new = old + 4
+  Test: divisible by 11
+    If true: throw to monkey 4
+    If false: throw to monkey 3
+
+Monkey 6:
+  Starting items: 99, 90, 84, 50
+  Operation: new = old * old
+  Test: divisible by 17
+    If true: throw to monkey 7
+    If false: throw to monkey 1
+
+Monkey 7:
+  Starting items: 50, 66, 61, 92, 64, 78
+  Operation: new = old + 3
+  Test: divisible by 2
+    If true: throw to monkey 5
+    If false: throw to monkey 1
+#+END_SRC
 * Day N :noexport:
 ** Code
 #+begin_src python :results output :var data=DAYN_DATA :exports both
@@ -10133,3 +10339,8 @@ for line in data.split('\n'):
 #+HEADER: :noweb
 #+BEGIN_SRC org :results value raw
 #+END_SRC
+
+* Local Variables
+# Local Variables:
+# org-babel-python-command: "python3"
+# End:
