@@ -11511,6 +11511,122 @@ Part 2: Max Sand: 30157
 520,43 -> 525,43
 505,65 -> 505,58 -> 505,65 -> 507,65 -> 507,55 -> 507,65 -> 509,65 -> 509,60 -> 509,65 -> 511,65 -> 511,56 -> 511,65 -> 513,65 -> 513,62 -> 513,65
 #+END_SRC
+* [[https://adventofcode.com/2022/day/15][Day 15]]
+** Code
+#+NAME: DAY15_CODE
+#+begin_src python :results output :var data=DAY15_DATA_EXAMPLE LINE=10 RANGE=0 :exports both
+import re
+import cmath
+p = re.compile(r'Sensor at x=([-]?[0-9]+), y=([-]?[0-9]+):'
+               r' closest beacon is at x=([-]?[0-9]+), y=([-]?[0-9]+)')
+
+def manhattan_distance(point1, point2):
+    return sum([abs(x1 - x2) for x1, x2 in zip(point1, point2)])
+
+def merge(ranges):
+    stack = []
+    stack.append(ranges[0])
+    for i in ranges[1:]:
+        if stack[-1][0] <= i[0] <= stack[-1][-1]:
+            stack[-1][-1] = max(stack[-1][-1], i[-1])
+        else:
+            stack.append(i)
+    return stack
+
+def find_line(sensors, y):
+    ranges = []
+    for s in sensors:
+        y_dist = abs(s[1] - y)
+        x_dist = s[2] - y_dist
+        if x_dist > 0:
+            ranges.append([s[0] - x_dist, s[0] + x_dist])
+    ranges = sorted(ranges)
+    ranges = merge(ranges)
+    return ranges
+
+sensors = []
+blocks = set()
+for line in data.split('\n'):
+    matches = p.match(line)
+    x, y = int(matches.group(1)), int(matches.group(2))
+    bx, by = int(matches.group(3)), int(matches.group(4))
+    sensors.append([x, y, manhattan_distance([x, y], [bx, by])])
+    blocks.add(complex(x, y))
+    blocks.add(complex(bx, by))
+
+print(sum(upper - lower for lower, upper in find_line(sensors, LINE)))
+
+freq_mul = 4000000
+
+if RANGE > 0:
+    for y in range(RANGE + 1):
+        ranges = find_line(sensors, y)
+        for lower, upper in zip(ranges[:], ranges[1:]):
+            if upper[0] - lower[1] > 1:
+                x = lower[1] + 1
+                if 0 <= x <= RANGE and complex(x, y) not in blocks:
+                    print(x * freq_mul + y)
+#+end_src
+
+#+CALL: DAY15_CODE(data=DAY15_DATA_EXAMPLE, LINE=10, RANGE=20)
+
+#+RESULTS:
+: 26
+: 56000011
+
+#+CALL: DAY15_CODE[:cache yes](data=DAY15_DATA, LINE=2000000, RANGE=4000000)
+
+#+RESULTS[ef2bafc910a785ad6ee6040faad55974a396bc45]:
+: 5125700
+: 11379394658764
+
+** Data :noexport:
+#+NAME: DAY15_DATA_EXAMPLE
+#+HEADER: :noweb
+#+begin_src org :results value raw
+Sensor at x=2, y=18: closest beacon is at x=-2, y=15
+Sensor at x=9, y=16: closest beacon is at x=10, y=16
+Sensor at x=13, y=2: closest beacon is at x=15, y=3
+Sensor at x=12, y=14: closest beacon is at x=10, y=16
+Sensor at x=10, y=20: closest beacon is at x=10, y=16
+Sensor at x=14, y=17: closest beacon is at x=10, y=16
+Sensor at x=8, y=7: closest beacon is at x=2, y=10
+Sensor at x=2, y=0: closest beacon is at x=2, y=10
+Sensor at x=0, y=11: closest beacon is at x=2, y=10
+Sensor at x=20, y=14: closest beacon is at x=25, y=17
+Sensor at x=17, y=20: closest beacon is at x=21, y=22
+Sensor at x=16, y=7: closest beacon is at x=15, y=3
+Sensor at x=14, y=3: closest beacon is at x=15, y=3
+Sensor at x=20, y=1: closest beacon is at x=15, y=3
+#+end_src
+#+NAME: DAY15_DATA
+#+HEADER: :noweb
+#+BEGIN_SRC org :results value raw
+Sensor at x=98246, y=1908027: closest beacon is at x=1076513, y=2000000
+Sensor at x=1339369, y=2083853: closest beacon is at x=1076513, y=2000000
+Sensor at x=679177, y=3007305: closest beacon is at x=1076513, y=2000000
+Sensor at x=20262, y=3978297: closest beacon is at x=13166, y=4136840
+Sensor at x=3260165, y=2268955: closest beacon is at x=4044141, y=2290104
+Sensor at x=2577675, y=3062584: closest beacon is at x=2141091, y=2828176
+Sensor at x=3683313, y=2729137: closest beacon is at x=4044141, y=2290104
+Sensor at x=1056412, y=370641: closest beacon is at x=1076513, y=2000000
+Sensor at x=2827280, y=1827095: closest beacon is at x=2757345, y=1800840
+Sensor at x=1640458, y=3954524: closest beacon is at x=2141091, y=2828176
+Sensor at x=2139884, y=1162189: closest beacon is at x=2757345, y=1800840
+Sensor at x=3777450, y=3714504: closest beacon is at x=3355953, y=3271922
+Sensor at x=1108884, y=2426713: closest beacon is at x=1076513, y=2000000
+Sensor at x=2364307, y=20668: closest beacon is at x=2972273, y=-494417
+Sensor at x=3226902, y=2838842: closest beacon is at x=3355953, y=3271922
+Sensor at x=22804, y=3803886: closest beacon is at x=13166, y=4136840
+Sensor at x=2216477, y=2547945: closest beacon is at x=2141091, y=2828176
+Sensor at x=1690953, y=2203555: closest beacon is at x=1076513, y=2000000
+Sensor at x=3055156, y=3386812: closest beacon is at x=3355953, y=3271922
+Sensor at x=3538996, y=719130: closest beacon is at x=2972273, y=-494417
+Sensor at x=2108918, y=2669413: closest beacon is at x=2141091, y=2828176
+Sensor at x=3999776, y=2044283: closest beacon is at x=4044141, y=2290104
+Sensor at x=2184714, y=2763072: closest beacon is at x=2141091, y=2828176
+Sensor at x=2615462, y=2273553: closest beacon is at x=2757345, y=1800840
+#+END_SRC
 * Day N                                                            :noexport:
 ** Code
 #+begin_src python :results output :var data=DAYN_DATA :exports both
